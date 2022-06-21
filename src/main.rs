@@ -2,8 +2,8 @@
 
 use bevy::{math::const_vec3, prelude::*};
 
-const BALL_STARTING_POSITION: Vec3 = const_vec3!([0.0, 150.0, 1.0]);
-const BALL_SIZE: Vec3 = const_vec3!([30.0, 30.0, 0.0]);
+const MOON_STARTING_POSITION: Vec3 = const_vec3!([0.0, 150.0, 1.0]);
+const MOON_SIZE: Vec3 = const_vec3!([30.0, 30.0, 0.0]);
 
 fn main() {
     App::new()
@@ -15,18 +15,18 @@ fn main() {
 }
 
 #[derive(Component)]
-struct Ball;
+struct Moon;
 
 // Add the game's entities to our world
 fn setup(mut commands: Commands) {
     // Cameras
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
-    // Ball
-    commands.spawn().insert(Ball).insert_bundle(SpriteBundle {
+    // Moon
+    commands.spawn().insert(Moon).insert_bundle(SpriteBundle {
         transform: Transform {
-            scale: BALL_SIZE,
-            translation: BALL_STARTING_POSITION,
+            scale: MOON_SIZE,
+            translation: MOON_STARTING_POSITION,
             ..default()
         },
         sprite: Sprite { ..default() },
@@ -35,8 +35,8 @@ fn setup(mut commands: Commands) {
 }
 
 // NOTES:
-//  * Without `With<Ball>` -- no complaints, no errors, no odd output, no warnings, just: ball does not move.
-fn update_position(mut query: Query<&mut Transform, With<Ball>>, time: Res<Time>) {
+//  * Without `With<Moon>` -- no complaints, no errors, no odd output, no warnings, just: moon does not move.
+fn update_position(mut query: Query<&mut Transform, With<Moon>>, time: Res<Time>) {
     for mut transform in query.iter_mut() {
         transform.translation.x = (time.seconds_since_startup() as f32).sin() * 150.;
         transform.translation.y = (time.seconds_since_startup() as f32).cos() * 150.;
