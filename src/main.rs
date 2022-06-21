@@ -14,7 +14,7 @@ const TIME_STEP: f32 = 0.25 / 60.0;
 // The `const_vec3!` macros are needed as functions that operate on floats cannot be constant in Rust.
 
 // We set the z-value of the ball to 1 so it renders on top in the case of overlapping sprites.
-const BALL_STARTING_POSITION: Vec3 = const_vec3!([0.0, -50.0, 1.0]);
+const BALL_STARTING_POSITION: Vec3 = const_vec3!([0.0, 150.0, 1.0]);
 const BALL_SIZE: Vec3 = const_vec3!([30.0, 30.0, 0.0]);
 const BALL_SPEED: f32 = 400.0;
 const INITIAL_BALL_DIRECTION: Vec2 = const_vec2!([0.5, -0.5]);
@@ -66,9 +66,12 @@ fn setup(mut commands: Commands) {
         .insert(Velocity(INITIAL_BALL_DIRECTION.normalize() * BALL_SPEED));
 }
 
-fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>) {
-    for (mut transform, velocity) in query.iter_mut() {
-        transform.translation.x += velocity.x * TIME_STEP;
-        transform.translation.y += velocity.y * TIME_STEP;
+// NOTES:
+//  * Without `With<Ball>` -- no complaints, no errors, no odd output, no warnings, just: ball does not move.
+//  * Multiplying by `TIME_STEPS` makes it toooo slooow.
+fn apply_velocity(mut query: Query<&mut Transform, With<Ball>>, time: Res<Time>) {
+    for mut transform in query.iter_mut() {
+        transform.translation.x = (time.seconds_since_startup() as f32).sin() * 150.;
+        transform.translation.y = (time.seconds_since_startup() as f32).cos() * 150.;
     }
 }
