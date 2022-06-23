@@ -1,44 +1,84 @@
 //! Anything-Goes Bevy Playground
 
-use bevy::{math::const_vec3, prelude::*};
+use bevy::{
+    core::FixedTimestep,
+    math::{const_vec2, const_vec3},
+    prelude::*,
+};
 
-const MOON_STARTING_POSITION: Vec3 = const_vec3!([0.0, 150.0, 1.0]);
-const MOON_SIZE: Vec3 = const_vec3!([30.0, 30.0, 0.0]);
+const TIME_STEP: f32 = 1.0 / 60.0;
+const TURTLE_STARTING_POSITION: Vec3 = const_vec3!([0.0, 150.0, 1.0]);
+const TURTLE_SIZE: Vec3 = const_vec3!([30.0, 30.0, 0.0]);
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
-        .add_system_set(SystemSet::new().with_system(update_position))
+        .add_system_set(
+            SystemSet::new()
+                .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
+                .with_system(apply_velocity)
+                .with_system(update_velocity.before(apply_velocity)),
+        )
         .add_system(bevy::input::system::exit_on_esc_system)
         .run();
 }
 
+const TURTLE_SPEED: f32 = 400.0;
+const INITIAL_TURTLE_DIRECTION: Vec2 = const_vec2!([0.5, -0.5]);
+
+#[derive(Component, Deref, DerefMut)]
+struct Velocity(Vec2);
+
 #[derive(Component)]
-struct Moon;
+struct Turtle;
 
 // Add the game's entities to our world
 fn setup(mut commands: Commands) {
     // Cameras
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
-    // Moon
-    commands.spawn().insert(Moon).insert_bundle(SpriteBundle {
-        transform: Transform {
-            scale: MOON_SIZE,
-            translation: MOON_STARTING_POSITION,
+    // Turtle
+    commands
+        .spawn()
+        .insert(Turtle)
+        .insert_bundle(SpriteBundle {
+            transform: Transform {
+                scale: TURTLE_SIZE,
+                translation: TURTLE_STARTING_POSITION,
+                ..default()
+            },
+            sprite: Sprite { ..default() },
             ..default()
-        },
-        sprite: Sprite { ..default() },
-        ..default()
-    });
+        })
+        .insert(Velocity(
+            INITIAL_TURTLE_DIRECTION.normalize() * TURTLE_SPEED,
+        ));
 }
 
-// NOTES:
-//  * Without `With<Moon>` -- no complaints, no errors, no odd output, no warnings, just: moon does not move.
-fn update_position(mut query: Query<&mut Transform, With<Moon>>, time: Res<Time>) {
-    for mut transform in query.iter_mut() {
-        transform.translation.x = (time.seconds_since_startup() as f32).sin() * 150.;
-        transform.translation.y = (time.seconds_since_startup() as f32).cos() * 150.;
+fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>) {
+    for (mut transform, velocity) in query.iter_mut() {
+        transform.translation.x += velocity.x * TIME_STEP;
+        transform.translation.y += velocity.y * TIME_STEP;
+    }
+}
+
+fn update_velocity(
+    keyboard_input: Res<Input<KeyCode>>,
+    mut velocity_query: Query<&mut Velocity, With<Turtle>>,
+) {
+    print!(".");
+    let mut velocity = velocity_query.single_mut();
+    if keyboard_input.just_pressed(KeyCode::Up) {
+        velocity.y += 1.;
+    }
+    if keyboard_input.just_pressed(KeyCode::Down) {
+        velocity.y -= 1.;
+    }
+    if keyboard_input.just_pressed(KeyCode::Left) {
+        velocity.x -= 1.;
+    }
+    if keyboard_input.just_pressed(KeyCode::Right) {
+        velocity.x += 1.;
     }
 }
