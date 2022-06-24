@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <h2>Note!</h2>
+    <p>This crate has experimental support for <code>externref</code>. It appears to work in the latest Firefox but may not work in you browser.</p>
+    <p>For more information, see the JavaScript console. (right-click anywhere, "inspect")</p>
+    <p>If you see "Hello from Rust!" below here, you have a browser that works!</p>
+    <hr />
+    <script type="module">
+      import init from './pkg/bevy_play.js';
+      window.addEventListener('load', async () => {
+	  await init('./pkg/bevy_play_bg.wasm');
+      });
+    </script>
+  </body>
+</html>

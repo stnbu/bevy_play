@@ -6,11 +6,14 @@ use bevy::{
     prelude::*,
 };
 
+use wasm_bindgen::prelude::*;
+
 const TIME_STEP: f32 = 1. / 60.0;
 const TURTLE_STARTING_POSITION: Vec3 = const_vec3!([0.0, 150.0, 1.0]);
 const TURTLE_SIZE: Vec3 = const_vec3!([30.0, 30.0, 0.0]);
 
-fn main() {
+#[wasm_bindgen(start)]
+pub fn start() -> Result<(), JsValue> {
     App::new()
         .add_plugins(DefaultPlugins)
         .insert_resource(Velocity(
@@ -25,6 +28,7 @@ fn main() {
         )
         .add_system(bevy::input::system::exit_on_esc_system)
         .run();
+    Ok(())
 }
 
 const TURTLE_SPEED: f32 = 400.0;
