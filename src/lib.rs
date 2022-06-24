@@ -1,4 +1,4 @@
-//! Anything-Goes Bevy Playground
+//! Bevy Thing III
 
 use bevy::{
     core::FixedTimestep,
@@ -9,12 +9,19 @@ use bevy::{
 use wasm_bindgen::prelude::*;
 
 const TIME_STEP: f32 = 1. / 60.0;
-const TURTLE_STARTING_POSITION: Vec3 = const_vec3!([0.0, 150.0, 1.0]);
+const TURTLE_STARTING_POSITION: Vec3 = const_vec3!([-190.0, 190.0, 1.0]);
 const TURTLE_SIZE: Vec3 = const_vec3!([30.0, 30.0, 0.0]);
+const INPUT_SIZE: f32 = 40.;
 
 #[wasm_bindgen(start)]
 pub fn start() -> Result<(), JsValue> {
     App::new()
+        .insert_resource(WindowDescriptor {
+            title: "Bevy Thing III".to_string(),
+            width: 800.,
+            height: 600.,
+            ..default()
+        })
         .add_plugins(DefaultPlugins)
         .insert_resource(Velocity(
             INITIAL_TURTLE_DIRECTION.normalize() * TURTLE_SPEED,
@@ -60,23 +67,23 @@ fn setup(mut commands: Commands) {
 
 fn apply_velocity(mut query: Query<&mut Transform, With<Turtle>>, velocity: Res<Velocity>) {
     for mut transform in query.iter_mut() {
-        transform.translation.x += velocity.x * TIME_STEP * 0.1;
-        transform.translation.y += velocity.y * TIME_STEP * 0.1;
+        transform.translation.x += velocity.x * TIME_STEP;
+        transform.translation.y += velocity.y * TIME_STEP;
     }
 }
 
 fn update_velocity(keyboard_input: Res<Input<KeyCode>>, mut velocity: ResMut<Velocity>) {
     info!("x:{}\t\t\ty:{}", velocity.x, velocity.y);
     if keyboard_input.just_pressed(KeyCode::Up) {
-        velocity.y += 20.;
+        velocity.y += INPUT_SIZE;
     }
     if keyboard_input.just_pressed(KeyCode::Down) {
-        velocity.y -= 20.;
+        velocity.y -= INPUT_SIZE;
     }
     if keyboard_input.just_pressed(KeyCode::Left) {
-        velocity.x -= 20.;
+        velocity.x -= INPUT_SIZE;
     }
     if keyboard_input.just_pressed(KeyCode::Right) {
-        velocity.x += 20.;
+        velocity.x += INPUT_SIZE;
     }
 }
