@@ -6,13 +6,16 @@ use bevy::{
     prelude::*,
 };
 
-const TIME_STEP: f32 = 1.0 / 60.0;
+const TIME_STEP: f32 = 1. / 60.0;
 const TURTLE_STARTING_POSITION: Vec3 = const_vec3!([0.0, 150.0, 1.0]);
 const TURTLE_SIZE: Vec3 = const_vec3!([30.0, 30.0, 0.0]);
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .insert_resource(Velocity(
+            INITIAL_TURTLE_DIRECTION.normalize() * TURTLE_SPEED,
+        ))
         .add_startup_system(setup)
         .add_system(update_velocity)
         .add_system_set(
@@ -28,7 +31,7 @@ const TURTLE_SPEED: f32 = 400.0;
 const INITIAL_TURTLE_DIRECTION: Vec2 = const_vec2!([0.5, -0.5]);
 
 // Could be a component; but there is only one
-#[derive(Default)]
+#[derive(Default, Deref, DerefMut)]
 struct Velocity(Vec2);
 
 #[derive(Component)]
@@ -51,24 +54,25 @@ fn setup(mut commands: Commands) {
     });
 }
 
-fn apply_velocity(mut query: Query<&mut Transform>, velocity: ResMut<Velocity>) {
+fn apply_velocity(mut query: Query<&mut Transform, With<Turtle>>, velocity: Res<Velocity>) {
     for mut transform in query.iter_mut() {
-        transform.translation.x += velocity.x * TIME_STEP;
-        transform.translation.y += velocity.y * TIME_STEP;
+        transform.translation.x += velocity.x * TIME_STEP * 0.1;
+        transform.translation.y += velocity.y * TIME_STEP * 0.1;
     }
 }
 
 fn update_velocity(keyboard_input: Res<Input<KeyCode>>, mut velocity: ResMut<Velocity>) {
+    info!("x:{}\t\t\ty:{}", velocity.x, velocity.y);
     if keyboard_input.just_pressed(KeyCode::Up) {
-        velocity.y += 1.;
+        velocity.y += 20.;
     }
     if keyboard_input.just_pressed(KeyCode::Down) {
-        velocity.y -= 1.;
+        velocity.y -= 20.;
     }
     if keyboard_input.just_pressed(KeyCode::Left) {
-        velocity.x -= 1.;
+        velocity.x -= 20.;
     }
     if keyboard_input.just_pressed(KeyCode::Right) {
-        velocity.x += 1.;
+        velocity.x += 20.;
     }
 }
