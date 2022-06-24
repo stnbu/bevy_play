@@ -17,4 +17,10 @@ The bigger point is that it's 99% Rust compiled to wasm and hosted with the ines
 
 if `./` is a web server you can go to `/index.html`, which will load the wasm, providing hour of fun.
 
+I sync with:
+
+```
+rsync -a index.html pkg mywebserver:/mypath/
+```
+
 The wasm file is 16mb, so you might have to blink a few times.
