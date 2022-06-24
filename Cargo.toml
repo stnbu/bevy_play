@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.7.0"
+
+[target.wasm32-unknown-unknown]
+runner = "wasm-server-runner"
