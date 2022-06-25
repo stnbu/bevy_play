@@ -9,9 +9,9 @@ use bevy::{
 use wasm_bindgen::prelude::*;
 
 const TIME_STEP: f32 = 1. / 60.0;
-const TURTLE_STARTING_POSITION: Vec3 = const_vec3!([-190.0, 190.0, 1.0]);
+const TURTLE_STARTING_POSITION: Vec3 = const_vec3!([-390.0, 290.0, 1.0]);
 const TURTLE_SIZE: Vec3 = const_vec3!([30.0, 30.0, 0.0]);
-const INPUT_SIZE: f32 = 40.;
+const INPUT_SIZE: f32 = 50.;
 
 #[wasm_bindgen(start)]
 pub fn start() -> Result<(), JsValue> {
@@ -67,8 +67,8 @@ fn setup(mut commands: Commands) {
 
 fn apply_velocity(mut query: Query<&mut Transform, With<Turtle>>, velocity: Res<Velocity>) {
     for mut transform in query.iter_mut() {
-        transform.translation.x += velocity.x * TIME_STEP;
-        transform.translation.y += velocity.y * TIME_STEP;
+        transform.translation.x += velocity.x * TIME_STEP * 0.05;
+        transform.translation.y += velocity.y * TIME_STEP * 0.05;
     }
 }
 
